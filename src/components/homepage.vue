@@ -13,7 +13,7 @@
             <div class="reset-password-close regular-button" @click="closeResetPassword()">Close</div>
         </div>
 
-        <div class="lr-authentication-wrapper" v-if="!accessToken && !resetPassword" >
+        <div class="lr-authentication-wrapper" v-if="!access_token && !resetPassword" >
             <div id="sociallogin-container"></div>
             <div class="forgotpassword-wrapper">
                 <div id="forgotpassword-container">
@@ -49,7 +49,7 @@
             <div :class="{ active: !loggingIn }" id="registration-container" class="lr-registration-container"></div>
         </div>
 
-        <div class="lr-account-wrapper" v-if="accessToken">
+        <div class="lr-account-wrapper" v-if="access_token">
 
             <div class="lr-frame lr-profile-left">
 
@@ -156,7 +156,7 @@
                 loggingIn: true,
                 resetPassword:false,
                 forgotpassword: false,
-                accessToken: window.localStorage.getItem('access_token'),
+                access_token: false,
                 alertMessage: null,
                 accountSettings: false,
                 editProfile: false,
@@ -172,7 +172,7 @@
 
         mounted() {
             this.socialLogin();
-            this.registration();
+            this.registration.call(this);
             this.login();
             this.forgotPassword();
             this.checkIfResettingPassword()
@@ -219,7 +219,6 @@
             //     });
             // }).bind(this);
 
-
             this.socialLogin();
             this.registration();
             this.login();
@@ -228,19 +227,19 @@
         },
 
         methods: {
-            makeAlert : (function(response) {
-                console.log('response',errors);
+            makeAlert : function(response) {
+                console.log('from make alert',response);
                 this.alertMessage = response.map((value)=>{
                     return value.Message;
                 },{});
-            }).bind(this),
+            },
 
-            checkIfResettingPassword : (function () {
+            checkIfResettingPassword : function () {
                 if (window.location.href.includes('?vtype=reset')) {
                     this.resetPassword = true;
                     let resetpassword_options = {
                         container : "resetpassword-container",
-                        onError : makeAlert,
+                        onError : this.makeAlert.bind(this),
                         onSuccess : (function(response) {
                             console.log('from reset password success',response);
                             this.alertMessage = "You have successfully reset your password";
@@ -248,14 +247,14 @@
                     };
                     LRObject.init("resetPassword", resetpassword_options);
                 }
-            }).bind(this),
+            },
 
-            checkIfDeletingUser : (function () {
+            checkIfDeletingUser : function () {
                 if (window.location.href.includes('?vtype=deleteuser')) {
                     this.deleteUser = true;
                     let resetpassword_options = {
                         container : "resetpassword-container",
-                        onError : makeAlert,
+                        onError : this.makeAlert.bind(this),
                         onSuccess : (function(response) {
                             console.log('from reset password success',response);
                             this.alertMessage = "You have successfully reset your password";
@@ -263,51 +262,52 @@
                     };
                     LRObject.init("resetPassword", resetpassword_options);
                 }
-            }).bind(this),
+            },
 
-            login : (function () {
+            login : function () {
                 let login_options = {
                     container : "login-container",
                     onSuccess : (function(response) {
                         console.log('login success',response);
-                        this.accessToken = response.access_token;
-                        window.localStorage.setItem('access_token', response.access_token);
+                        this.access_token = response.access_token;
+                        console.log('login access token',this.access_token);
+                        window.localStorage.setItem('access_token', this.access_token);
                         this.profile = response.Profile;
                         this.alertMessage = null;
                     }).bind(this),
-                    onError : this.makeAlert,
+                    onError : this.makeAlert.bind(this),
                 };
 
                 LRObject.util.ready(function() {
                     LRObject.init("login",login_options);
                 });
-            }).bind(this),
+            },
 
-            socialLogin : (function socialLogin() {
+            socialLogin : function socialLogin() {
                 let sociallogin_options = {
                     templateName : 'loginradiuscustom_tmpl',
                     container : 'sociallogin-container',
                     onSuccess : (function(response) {
                         console.log('social login response',response);
-                        this.accessToken = response.access_token;
+                        this.access_token = response.access_token;
                         window.localStorage.setItem('access_token', response.access_token);
                         this.profile = response.Profile;
-                        console.log("this.accessToken",this.accessToken);
+                        console.log("this.access_token",this.access_token);
                     }).bind(this),
-                    onError : this.makeAlert,
+                    onError : this.makeAlert.bind(this),
                 };
 
                 LRObject.util.ready(function() {
                     LRObject.customInterface("interfacecontainerdiv", {templateName : 'loginradiuscustom_tmpl'});
                     LRObject.init('socialLogin', sociallogin_options);
                 });
-            }).bind(this),
+            },
 
-            forgotPassword : (function () {
+            forgotPassword : function () {
                 let forgotpassword_options = {
                     container : "forgotpassword-container",
                     onSuccess : function(response) {console.log('from password recovery',response)},
-                    onError : this.makeAlert,
+                    onError : this.makeAlert.bind(this),
                     resetPasswordUrl : "http://localhost:8080",
                     verificationUrl : window.location.origin,
                 };
@@ -315,23 +315,23 @@
                 LRObject.util.ready(function() {
                     LRObject.init("forgotPassword", forgotpassword_options);
                 });
-            }).bind(this),
+            },
 
 
-            registration : (function () {
+            registration : function () {
                 let registration_options = {
                     container : "registration-container",
                     onSuccess : (function(response) {
                         console.log('success response',response);
                         this.alertMessage = (response.IsPosted && !response.Data) ? {1:"A verification email has been sent to the email address provided."} : null;
                     }).bind(this),
-                    onError : this.makeAlert,
+                    onError : this.makeAlert.bind(this)
                 };
 
                 LRObject.util.ready(function() {
                     LRObject.init("registration",registration_options);
                 });
-            }).bind(this),
+            },
 
             onDeleteAccountClick() {
 
@@ -360,7 +360,7 @@
             },
 
             onLogoutClick() {
-                this.accessToken = null;
+                this.access_token = null;
                 window.localStorage.removeItem('access_token');
             },
 
@@ -377,7 +377,7 @@
                         this.alertMessage = "Password changed successfully.";
                         console.log('change password success',response);
                     }).bind(this),
-                    onError : this.makeAlert,
+                    onError : this.makeAlert.bind(this),
                 };
 
                 LRObject.util.ready(function() {
@@ -389,8 +389,8 @@
                 this.toggleOn("editProfile");
                 let profileeditor_options = {
                     container : "profileeditor-container",
-                    onSuccess : this.makeAlert,
-                    onError : this.makeAlert
+                    onSuccess : this.makeAlert.bind(this),
+                    onError : this.makeAlert.bind(this)
 
                 };
                 LRObject.util.ready(function() {
