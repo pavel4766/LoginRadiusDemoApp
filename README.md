@@ -26,7 +26,7 @@ Logout from the app
 
 ## What is broken on my demo:
 
-Facebook login returns an Invalid Scopes: user_birthday, user_location error. Upon editing External Permissions in platform configurations, saving the profile, navigating away from it and navigating back to it, the changes in scope are reset.  I am getting the same error when logging in with facebook through the hosted app at https://lr-candidate4.hub.loginradius.com
+Facebook login returns an Invalid Scopes: user_birthday, user_location error. Changed the social settings to only get basic data and reduced scope in custom permissions, but still no luck.  I am getting the same error when logging in with facebook through the hosted app at https://lr-candidate4.hub.loginradius.com
 
 Logging in with Twitter returns a message informing the user that an email has been sent to verify email address, but email does not get delivered.  This is the same as on the hosted app at https://lr-candidate4.hub.loginradius.com
 
