@@ -13,4 +13,10 @@ goto the directory src/assets/options.js to update credentials
 npm run dev
 ```
 
+## Notes
+``` bash
+# Features implemented
+Traditional sign up and login
+
+```
 
