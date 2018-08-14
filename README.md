@@ -1,6 +1,5 @@
-# LoginRadius Demo
 
-> A demo project utilizing the JS Widgets from LoginRadius for the Vue framework.
+> A demo project as a part of my application to LoginRadius utilizing the official Vue.JS template
 
 ## Getting Started
 ``` bash
@@ -8,14 +7,10 @@
 npm install
 
 # setup credentials
-goto the directory src/assets/options.js and fill in the required fields
+goto the directory src/assets/options.js to update credentials
 
 # serve with hot reload at localhost:8080
 npm run dev
 ```
 
-# Features Supported
-1. Login
-2. Register
-3. Resend Email Verification
-4. Social Login
+
