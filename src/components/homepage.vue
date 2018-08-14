@@ -130,7 +130,7 @@
                         <h5 class="lr-setting-label">Delete Account</h5>
                         <!--<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Dicta architecto aliquid sit aspernatur officia, quam.</p>-->
                         <div class="lr-action-box">
-                            <a class="lr-button regular-button" @click="onDeleteAccountClick();">Delete my account</a>
+                            <a class="lr-button regular-button" @click="onDeleteAccountClick()">Delete my account</a>
                         </div>
                     </div>
 
@@ -149,6 +149,7 @@
 </template>
 
 <script >
+
     export default {
         data(){
             return {
@@ -160,6 +161,7 @@
                 accountSettings: false,
                 editProfile: false,
                 changePassword: false,
+                deleteUser: false,
                 Profile: null,
                 profile: {
                     ImageUrl: null,
@@ -169,104 +171,19 @@
         },
 
         mounted() {
-
-            let onError = function(errors) {
-                console.log('errors',errors);
-                if (errors[0].ErrorCode == 970) {
-                    // I think this one is for registering with twitter
-                }
-                this.alertMessage = errors.map((value,index)=>{
-                    return value.Message;
-                },{});
-            };
-
-            (function socialLogin() {
-                let sociallogin_options = {
-                    templateName : 'loginradiuscustom_tmpl',
-                    container : 'sociallogin-container',
-                    onSuccess : (function(response) {
-                        console.log('social login response',response);
-                        this.accessToken = response.access_token;
-                        window.localStorage.setItem('access_token', response.access_token);
-                        this.profile = response.Profile;
-                        this.Profile = response.Profile;
-                        console.log("this.accessToken",this.accessToken);
-                    }).bind(this),
-                    onError : onError.bind(this),
-                };
-
-                LRObject.util.ready(function() {
-                    LRObject.customInterface("interfacecontainerdiv", {templateName : 'loginradiuscustom_tmpl'});
-                    LRObject.init('socialLogin', sociallogin_options);
-                });
-            }).call(this);
-
-            (function registration () {
-                let registration_options = {
-                    container : "registration-container",
-                    onSuccess : (function(response) {
-                        console.log('success response',response);
-                        this.alertMessage = (response.IsPosted && !response.Data) ? {1:"A verification email has been sent to the email address provided."} : null;
-                    }).bind(this),
-                    onError : onError.bind(this),
-                };
-
-                LRObject.util.ready(function() {
-                    LRObject.init("registration",registration_options);
-                });
-            }).call(this);
-
-            (function login () {
-                let login_options = {
-                    container : "login-container",
-                    onSuccess : (function(response) {
-                        console.log('login success',response);
-                        this.accessToken = response.access_token;
-                        window.localStorage.setItem('access_token', response.access_token);
-                        this.profile = response.Profile;
-                        this.Profile = response.Profile;
-                        this.alertMessage = null;
-                    }).bind(this),
-                    onError : onError.bind(this),
-                };
-
-                LRObject.util.ready(function() {
-                    LRObject.init("login",login_options);
-                });
-            }).call(this);
-
-            (function forgotPassword() {
-                let forgotpassword_options = {
-                    container : "forgotpassword-container",
-                    onSuccess : function(response) {console.log('from password recovery',response)},
-                    onError : onError.bind(this),
-                    resetPasswordUrl : "http://localhost:8080",
-                    verificationUrl : window.location.origin,
-                };
-
-                console.log('forgotpassword_options',forgotpassword_options);
-
-                LRObject.util.ready(function() {
-                    LRObject.init("forgotPassword", forgotpassword_options);
-                });
-            }).call(this);
-
-
-            if (window.location.href.includes('?vtype=reset')) {
-                this.resetPassword = true;
-                let resetpassword_options = {
-                    container : "resetpassword-container",
-                    onError : onError.bind(this),
-                    onSuccess : (function(response) {
-                        console.log('from reset password success',response);
-                        this.alertMessage = "You have successfully reset your password";
-                    }).bind(this),
-                };
-                LRObject.init("resetPassword", resetpassword_options);
-            }
+            this.socialLogin();
+            this.registration();
+            this.login();
+            this.forgotPassword();
+            this.checkIfResettingPassword()
         },
 
         updated: function() {
+
+            // onError : (function(response) {
+            //     this.alertMessage = response.map((value,index)=>{
+            //         return value.Message;
+            //     },{})}
 
             // (function makeSocialLinkingContainer() {
             //     var la_options = {};
@@ -303,18 +220,70 @@
             // }).bind(this);
 
 
+            this.socialLogin();
+            this.registration();
+            this.login();
+            this.forgotPassword();
+            this.checkIfResettingPassword()
+        },
 
-            let onError = function(errors) {
-                console.log('errors',errors);
-                if (errors[0].ErrorCode == 970) {
-                    // I think this one is for registering with twitter
-                }
-                this.alertMessage = errors.map((value,index)=>{
+        methods: {
+            makeAlert : (function(response) {
+                console.log('response',errors);
+                this.alertMessage = response.map((value)=>{
                     return value.Message;
                 },{});
-            };
+            }).bind(this),
 
-            (function socialLogin() {
+            checkIfResettingPassword : (function () {
+                if (window.location.href.includes('?vtype=reset')) {
+                    this.resetPassword = true;
+                    let resetpassword_options = {
+                        container : "resetpassword-container",
+                        onError : makeAlert,
+                        onSuccess : (function(response) {
+                            console.log('from reset password success',response);
+                            this.alertMessage = "You have successfully reset your password";
+                        }).bind(this),
+                    };
+                    LRObject.init("resetPassword", resetpassword_options);
+                }
+            }).bind(this),
+
+            checkIfDeletingUser : (function () {
+                if (window.location.href.includes('?vtype=deleteuser')) {
+                    this.deleteUser = true;
+                    let resetpassword_options = {
+                        container : "resetpassword-container",
+                        onError : makeAlert,
+                        onSuccess : (function(response) {
+                            console.log('from reset password success',response);
+                            this.alertMessage = "You have successfully reset your password";
+                        }).bind(this),
+                    };
+                    LRObject.init("resetPassword", resetpassword_options);
+                }
+            }).bind(this),
+
+            login : (function () {
+                let login_options = {
+                    container : "login-container",
+                    onSuccess : (function(response) {
+                        console.log('login success',response);
+                        this.accessToken = response.access_token;
+                        window.localStorage.setItem('access_token', response.access_token);
+                        this.profile = response.Profile;
+                        this.alertMessage = null;
+                    }).bind(this),
+                    onError : this.makeAlert,
+                };
+
+                LRObject.util.ready(function() {
+                    LRObject.init("login",login_options);
+                });
+            }).bind(this),
+
+            socialLogin : (function socialLogin() {
                 let sociallogin_options = {
                     templateName : 'loginradiuscustom_tmpl',
                     container : 'sociallogin-container',
@@ -325,82 +294,47 @@
                         this.profile = response.Profile;
                         console.log("this.accessToken",this.accessToken);
                     }).bind(this),
-                    onError : onError.bind(this),
+                    onError : this.makeAlert,
                 };
 
                 LRObject.util.ready(function() {
                     LRObject.customInterface("interfacecontainerdiv", {templateName : 'loginradiuscustom_tmpl'});
                     LRObject.init('socialLogin', sociallogin_options);
                 });
-            }).call(this);
+            }).bind(this),
 
-            (function registration () {
-                    let registration_options = {
-                        container : "registration-container",
-                        onSuccess : (function(response) {
-                            console.log('success response',response);
-                            this.alertMessage = (response.IsPosted && !response.Data) ? {1:"A verification email has been sent to the email address provided."} : null;
-                        }).bind(this),
-                        onError : onError.bind(this),
-                    };
-
-                    LRObject.util.ready(function() {
-                        LRObject.init("registration",registration_options);
-                    });            }
-
-            ).call(this);
-
-            (function login () {
-                let login_options = {
-                    container : "login-container",
-                    onSuccess : (function(response) {
-                        console.log('login success',response);
-                        this.accessToken = response.access_token;
-                        window.localStorage.setItem('access_token', response.access_token);
-                        this.profile = response.Profile;
-                        this.alertMessage = null;
-                    }).bind(this),
-                    onError : onError.bind(this),
-                };
-
-                LRObject.util.ready(function() {
-                    LRObject.init("login",login_options);
-                });
-            }).call(this);
-
-            (function forgotPassword() {
+            forgotPassword : (function () {
                 let forgotpassword_options = {
                     container : "forgotpassword-container",
                     onSuccess : function(response) {console.log('from password recovery',response)},
-                    onError : onError.bind(this),
+                    onError : this.makeAlert,
                     resetPasswordUrl : "http://localhost:8080",
                     verificationUrl : window.location.origin,
                 };
-
                 console.log('forgotpassword_options',forgotpassword_options);
-
                 LRObject.util.ready(function() {
                     LRObject.init("forgotPassword", forgotpassword_options);
                 });
-            }).call(this);
+            }).bind(this),
 
 
-            if (window.location.href.includes('?vtype=reset')) {
-                this.resetPassword = true;
-                let resetpassword_options = {
-                    container : "resetpassword-container",
-                    onError : onError.bind(this),
+            registration : (function () {
+                let registration_options = {
+                    container : "registration-container",
                     onSuccess : (function(response) {
-                        console.log('from reset password success',response);
-                        this.alertMessage = "You have successfully reset your password";
+                        console.log('success response',response);
+                        this.alertMessage = (response.IsPosted && !response.Data) ? {1:"A verification email has been sent to the email address provided."} : null;
                     }).bind(this),
+                    onError : this.makeAlert,
                 };
-                LRObject.init("resetPassword", resetpassword_options);
-            }
-        },
 
-        methods: {
+                LRObject.util.ready(function() {
+                    LRObject.init("registration",registration_options);
+                });
+            }).bind(this),
+
             onDeleteAccountClick() {
+
                 // let deleteuser_options = {};
                 // deleteuser_options.onSuccess = function(response) {
                 //     this.alertMessage = "An confirmation email has been sent to your email account."
@@ -414,29 +348,15 @@
                 //     LRObject.init("deleteUser", deleteuser_options);
                 // });
 
-
-                /**
-                 * Delete Account with Email Confirmation
-                 *
-                 * @function
-                 * @public
-                 * @param The deleteurl you would like to the user to be presented when receiving the email.
-                 * @param The email template to be used
-                 * @param handle {CallbackHandler} callback handler, invoke after getting Responce from LoginRadius
-                 */
-
                 LoginRadiusSDK.deleteAccountWithEmailConfirmation('localhost:8080',null, function (data) {
                     console.log('data',data);
                 });
             },
+
             toggleOn(container) {
                this.editProfile = (container === "editProfile");
                this.accountSettings = (container === "accountSettings");
                this.changePassword = (container === "changePassword");
-            },
-
-            onLoggedIn() {
-                this.$emit('update',"loggedin")
             },
 
             onLogoutClick() {
@@ -451,48 +371,35 @@
 
             onChangePasswordClick() {
                 this.toggleOn("changePassword");
-                var changepassword_options = {};
-                changepassword_options.container = "changepassword-container";
-                changepassword_options.onSuccess = (function(response) {
-                    this.alertMessage = "Password changed successfully.";
-                    console.log('change password success',response);
-                }).bind(this);
-                changepassword_options.onError = (function(response) {
-                    this.alertMessage = response.map((value,index)=>{
-                        return value.Message;
-                    },{});
-                }).bind(this);
+                let changepassword_options = {
+                    container : "changepassword-container",
+                    onSuccess : (function(response) {
+                        this.alertMessage = "Password changed successfully.";
+                        console.log('change password success',response);
+                    }).bind(this),
+                    onError : this.makeAlert,
+                };
 
                 LRObject.util.ready(function() {
                     LRObject.init("changePassword",changepassword_options);
                 });
             },
+
             onEditProfileClick(){
                 this.toggleOn("editProfile");
-                var profileeditor_options = {};
-                profileeditor_options.container = "profileeditor-container";
-                profileeditor_options.onSuccess = function(response) {
-                    console.log('update profile success',response);
-                };
-                profileeditor_options.onError = function(response) {
-                    this.alertMessage = response.map((value,index)=>{
-                        return value.Message;
-                    },{});
-                };
+                let profileeditor_options = {
+                    container : "profileeditor-container",
+                    onSuccess : this.makeAlert,
+                    onError : this.makeAlert
 
+                };
                 LRObject.util.ready(function() {
-
                     LRObject.init("profileEditor",profileeditor_options);
-
-
                 });
-
             },
             onAccountSettingsClick(){
                 this.toggleOn("accountSettings");
             }
-
-
         },
         components: {
             // Login,

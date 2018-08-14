@@ -1,5 +1,5 @@
 
-> A demo project as a part of my application to LoginRadius utilizing the official Vue.JS template
+> A demo project as a part of my application to LoginRadius utilizing the official Vue.JS templateedit
 
 ## Getting Started
 ``` bash
