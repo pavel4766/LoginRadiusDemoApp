@@ -14,9 +14,15 @@ npm run dev
 ```
 
 ## Notes
-``` bash
 # Features implemented
+Reative interface implimented with the Vue.JS framework
 Traditional sign up and login
+Social media login
+Forgot password email and recovery page
+Error reporting
+Change password functionality
+Delete account functionality
+Logout from the app
 
 ## What is broken on my demo:
 
@@ -30,5 +36,5 @@ The delete account functionality was implemented through the SDK and is giving m
 
 
 
-```
+
 
