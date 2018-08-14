@@ -16,12 +16,19 @@ npm run dev
 ## Notes
 # Features implemented
 Reative interface implimented with the Vue.JS framework
+
 Traditional sign up and login
+
 Social media login
+
 Forgot password email and recovery page
+
 Error reporting
+
 Change password functionality
+
 Delete account functionality
+
 Logout from the app
 
 ## What is broken on my demo:
