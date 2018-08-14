@@ -19,7 +19,7 @@ Reative interface implimented with the Vue.JS framework
 
 Traditional sign up and login
 
-Social media login
+Social media login works especially well with Google
 
 Forgot password email and recovery page
 
