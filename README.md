@@ -32,7 +32,7 @@ Logging in with Twitter returns a message informing the user that an email has b
 
 The Edit Profile functionality is partially broken. Using the profile editor template, I had empty inputs with class content-loginradius-termsandcondition rendered.
 
-The delete account functionality was implemented through the SDK and is giving me an "The account limit for email requests for this resource has been reached for this time due to too many request" error right now. 
+I wasn't able to find anywhere in the docs how to set the deleteUrl when using the template for deleting users so I implemented the delete account functionality through the SDK.  Currently, it is giving me an "The account limit for email requests for this resource has been reached for this time due to too many request" error. 
 
 
 
