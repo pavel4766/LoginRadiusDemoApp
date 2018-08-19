@@ -1,5 +1,5 @@
 
-> A demo project as a part of my application to LoginRadius utilizing the official Vue.JS template
+> A demo project as a part of my application to LoginRadius utilizing the official Vue.JS templateedit
 
 ## Getting Started
 ``` bash
@@ -17,12 +17,19 @@ npm run dev
 # Features implemented
 Reactive interface implimented with the Vue.JS framework
 Traditional sign up and login
-Social media login
+
+Social media login works especially well with Google
+
 Forgot password email and recovery page
+
 Error reporting
+
 Change password functionality
+
 Delete account functionality
+
 Edit Profile
+
 Logout from the app
 
 ## What is broken on my demo:
