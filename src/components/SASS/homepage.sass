@@ -88,6 +88,11 @@ body
     &.lr-flat-google
       background-color: #dd4b39
 
+  .regular-button
+    &.inactive
+      opacity: .5
+      pointer-events: none
+
   .lr-app-main
     width: 90%
     max-width: 1000px
@@ -97,6 +102,19 @@ body
     display: flex
     flex-direction: column
 
+    .lr-delete-account-wrapper
+      .lr-buttons-container
+        display: flex
+        flex-direction: column
+        width: 20%
+        .regular-button
+          border: none
+          &.delete
+            background: red
+          &.cancel
+            background: grey
+
+
 
 
     &.forgotpassword
@@ -104,8 +122,11 @@ body
         display: none !important
       .forgotpassword-wrapper
         display: block
-    //.forgotpassword-contaienr
-    //  margin-top: 20px
+        margin-top: 40px
+        label
+          padding-left: 25px
+      .regular-button
+        text-align: center
     &:not(.forgotpassword)
       form[name="loginradius-forgotpassword"]
         display: none
