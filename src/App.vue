@@ -13,7 +13,6 @@
     import LoggedIn from './components/loggedin.vue'
     import EmailVerified from './components/email-verified.vue'
     import ResetPassword from './components/resetpassword.vue'
-    import LoginRadiusSDK from './assets/LoginRadiusV2SDK.1.1.0'
 
 
 
@@ -38,8 +37,7 @@
 
         mounted: function () {
             let verification = window.location.href.includes('?vtype=emailverification');
-            let resetPassword = window.location.href.includes('?vtype=reset');
-            if (!verification && !resetPassword) {
+            if (!verification) {
                 return;
             }
 
@@ -54,33 +52,6 @@
                 };
                 LRObject.init('verifyEmail', verifyemail_options);
             }
-
-            if (resetPassword) {
-                // let resetpassword_options = {
-                //     container : "resetpassword-container",
-                //     onError : (function(errors) {
-                //         console.log('from reset password error',errors);
-                //     }).bind(this),
-                //     onSuccess : (function(response) {
-                //         console.log('from reset password success',response);
-                //         this.lr_display = "resetpassword";
-                //     }).bind(this),
-                // };
-                //
-                // var resetpassword_options = {};
-                // resetpassword_options.container = "resetpassword-container";
-                // resetpassword_options.onSuccess = function(response) {
-                //     console.log(response);
-                //     this.lr_display = "resetpassword";
-                // };
-                // resetpassword_options.onError = function(errors) {
-                //     console.log(errors);
-                // };
-                // console.log('resetpassword_options.onSuccess',resetpassword_options.onSuccess);
-                // LRObject.init("resetPassword", resetpassword_options);
-
-            }
-
         }
     }
 </script>

@@ -1,5 +1,5 @@
 <template>
-    <div class="lr-app-main" :class="{ forgotpassword: forgotpassword}">
+    <div class="lr-app-main" :class="{ forgotPassword: forgotPassword}">
         <div v-if="alertMessage" class="lr-alert-container">
             <ul id="v-for-object" class="demo">
                 <li v-for="value in alertMessage">
@@ -17,7 +17,7 @@
             <div>Are you sure you want to delete your account?</div>
             <div class="lr-buttons-container">
                 <div class="regular-button delete" @click="onDeleteUserConfirm">Delete Account</div>
-                <div class="regular-button cancel" @click="deleteUser=false">Cancel</div>
+                <div class="regular-button cancel" @click="onCancelDeleteClick">Cancel</div>
             </div>
         </div>
 
@@ -26,7 +26,7 @@
             <div class="forgotpassword-wrapper">
                 <div id="forgotpassword-container">
                 </div>
-                <div class ="regular-button" @click="forgotpassword = false">Cancel</div>
+                <div class ="regular-button" @click="forgotPassword = false">Cancel</div>
             </div>
 
             <div class="login-register">
@@ -37,15 +37,17 @@
             <div class="lr-login-wrapper " :class="{ active: loggingIn }">
                 <div id="login-container" class="lr-login-container" > </div>
                 <div class="lr-forgot-password" @click="forgotPassword=true">
-                    <a href="#" @click="forgotpassword = true">Forgot Password?</a>
+                    <a href="#" @click="forgotPassword = true">Forgot Password?</a>
                 </div>
-                <div :class="{ active: loggingIn }" id="lr-social-login" class="lr-social-login-frame lr-frames lr-sample-background-enabled cf">
+                <div :class="{ active: loggingIn }" id="lr-social-login" class="lr-social-login-frame lr-frames lr-sample-background-enabled cf" @click="facebookOverride" >
                         <h2 class="lr-social-login-message">Login with your social account</h2>
                         <div id="interfacecontainerdiv" class="lr-sl-shaded-brick-frame cf lr-widget-container">
                         <script type="text/html" id="loginradiuscustom_tmpl">
                             <span class="lr-provider-label lr-sl-shaded-brick-button lr-flat-<#=Name.toLowerCase()#>"
                                   onclick=" return LRObject.util.openWindow('<#= Endpoint #>'); "
                                  title="Sign up with <#= Name #>" alt="Sign in with <#= Name#>">
+
+
                                 <span class="lr-sl-icon lr-sl-icon-<#= Name.toLowerCase()#>"></span>
                                 Login with <#= Name#>
                             </span>
@@ -64,7 +66,8 @@
                     <img :src="profile.ImageUrl">
                 </div>
 
-                <h1 class="lr-profile-name">{{profile.FullName}}</h1>
+                <h1 class="lr-profile-name">{{profile.FirstName}}</h1>
+                <h1 class="lr-profile-name">{{profile.LastName}}</h1>
                 <div class="lr-profile-info">
                     <p></p>
                 </div>
@@ -101,11 +104,11 @@
                 <div class="lr-menu lr-account-menu">
                     <div class="lr-menu-button"></div>
                     <div class="lr-menu-list-frame">
-                        <a class="lr-settings lr-menu-list lr-show-settings" @click="onEditProfileClick" >Edit Profile</a>
+                        <a class="lr-settings lr-menu-list lr-show-settings" @click="toggleOn('editProfile')" >Edit Profile</a>
 
                         <a class="lr-settings lr-menu-list lr-show-settings"  @click="onChangePasswordClick">Change Password</a>
 
-                        <a class="lr-settings lr-menu-list lr-show-settings" @click="onAccountSettingsClick" >Account Settings</a>
+                        <a class="lr-settings lr-menu-list lr-show-settings" @click="toggleOn('accountSettings')" >Account Settings</a>
 
                         <a class="lr-logout lr-menu-list" @click="onLogoutClick">Logout</a>
                     </div>
@@ -168,8 +171,8 @@
                 lastName : null,
                 loggingIn: true,
                 resetPassword:false,
-                forgotpassword: false,
-                accessToken: false,
+                forgotPassword: false,
+                accessToken: null,
                 alertMessage: null,
                 accountSettings: false,
                 editProfile: false,
@@ -180,79 +183,53 @@
             }
         },
 
-        // computed() {
-        //   function checkInputs () {
-        //       return {
-        //           active: (this.firstName || this.lastName)
-        //       }
-        //   }
-        // },
 
         mounted() {
-            this.socialLogin();
-            this.registration.call(this);
-            this.login();
-            this.forgotPassword();
+            this.initializeSocialLogin();
+            this.initializeRegistration();
+            this.initializeLogin();
+            this.initializeForgotPassword();
             this.checkIfResettingPassword();
             this.checkIfDeletingUser();
-
         },
 
         updated: function() {
-
-            // onError : (function(response) {
-            //     this.alertMessage = response.map((value,index)=>{
-            //         return value.Message;
-            //     },{})}
-
-            // (function makeSocialLinkingContainer() {
-            //     var la_options = {};
-            //     la_options.container = "interfacecontainerdiv";
-            //     la_options.templateName = 'loginradiuscustom_tmpl_link';
-            //     la_options.onSuccess = function(response) {
-            //         console.log('linking success',response);
-            //     };
-            //     la_options.onError = (function(errors) {
-            //         this.alertMessage = errors.map((value,index)=>{
-            //             return value.Message;
-            //         },{});
-            //     });
-            //
-            //     LRObject.util.ready(function() {
-            //         LRObject.init("linkAccount", la_options);
-            //     });
-            // }).bind(this);
-
-            // (function makeSocialUnlinkingContainer(){
-            //     var unlink_options = {};
-            //     unlink_options.onSuccess = function(response) {
-            //         console.log('unlink success',response);
-            //     };
-            //     unlink_options.onError = (function(errors) {
-            //         this.alertMessage = errors.map((value,index)=>{
-            //             return value.Message;
-            //         },{});
-            //     }).bind(this);
-            //
-            //     LRObject.util.ready(function() {
-            //         LRObject.init("unLinkAccount", unlink_options);
-            //     });
-            // }).bind(this);
-
-            this.socialLogin();
-            this.registration();
-            this.login();
-            this.forgotPassword();
+            this.initializeSocialLogin();
+            this.initializeRegistration();
+            this.initializeLogin();
+            this.initializeForgotPassword();
             this.checkIfResettingPassword();
             this.checkIfDeletingUser();
         },
 
         methods: {
+            //
+            facebookOverride: function(e) {
+                // if (e.target.classList.contains('lr-flat-facebook')) {
+                //     e.preventDefault();
+                //     e.stopPropagation();
+                //     LRObject.util.openWindow('https://www.facebook.com/v2.12/dialog/oauth?client_id=1972811883009921&redirect_uri=https%3a%2f%2flr-candidate4.hub.loginradius.com%3a443%2fsocialauth%2fvalidate.sauth&response_type=code&display=popup&scope=public_profile');
+                //
+                //     // LRObject.util.openWindow('https://www.facebook.com/v2.12/dialog/oauth?client_id=1972811883009921&redirect_uri=http://localhost:8080%3a443%2fsocialauth%2fvalidate.sauth&response_type=code&display=popup&scope=public_profile');
+                //     return false;
+                // }
+            },
             makeAlert : function(response) {
-                console.log('from make alert',response);
-                this.alertMessage = response.map((value)=>{
-                    return value.Message;
-                },{});
+                console.log('makeAlert arguments', arguments);
+                if (Array.isArray(response)) {
+                    this.alertMessage = response.map((value)=>{
+                        if (value.Message) {
+                            return value.Message;
+                        } else {
+                            return value;
+                        }
+                    },{});
+                } else if (typeof response  === "object") {
+                    this.alertMessage = response;
+                } else (
+                    console.log('from make alert',response)
+                );
+                setTimeout(()=>this.alertMessage = null, 4000);
             },
 
             checkIfResettingPassword : function () {
@@ -261,10 +238,7 @@
                     let resetpassword_options = {
                         container : "resetpassword-container",
                         onError : this.makeAlert.bind(this),
-                        onSuccess : (function(response) {
-                            console.log('from reset password success',response);
-                            this.alertMessage = "You have successfully reset your password";
-                        }).bind(this),
+                        onSuccess : this.makeAlert.bind(this, ["You have successfully reset your password"]),
                     };
                     LRObject.init("resetPassword", resetpassword_options);
                 }
@@ -273,22 +247,32 @@
             checkIfDeletingUser : function () {
                 if (window.location.href.includes('?vtype=deleteuser')) {
                     this.deleteUser = true;
-                    this.deleteToken = window.location.href.match('(vtoken=)(.*)');
+                    this.deleteToken = window.location.href.match('(vtoken=)(.*)')[2];
                 }
             },
 
-            onDeleteUserConfirm: function () {
-                LoginRadiusSDK.deleteAccount(this.deleteToken,(data)=> console.log('from account delete',data));
+            onCancelDeleteClick : function () {
+                //this will get rid of the delete token in the path
+                window.location.href = window.location.origin;
+                this.deleteUser = false;
             },
 
-            login : function () {
+
+
+            onDeleteUserConfirm: function () {
+                console.log('delete token', this.deleteToken);
+                LoginRadiusSDK.deleteAccount(this.deleteToken,this.makeAlert.bind(this,["Your account has been successfully deleted"]));
+                this.onLogoutClick();
+            },
+
+            initializeLogin : function () {
                 let login_options = {
                     container : "login-container",
                     onSuccess : (function(response) {
                         console.log('login success',response);
                         this.accessToken = response.access_token;
-                        console.log('login access token',this.access_token);
-                        window.localStorage.setItem('accessToken', this.access_token);
+                        console.log('login access token',this.accessToken);
+                        window.localStorage.setItem('accessToken', this.accessToken);
                         this.profile = response.Profile;
                         this.alertMessage = null;
                     }).bind(this),
@@ -300,14 +284,14 @@
                 });
             },
 
-            socialLogin : function socialLogin() {
+            initializeSocialLogin : function socialLogin() {
                 let sociallogin_options = {
                     templateName : 'loginradiuscustom_tmpl',
                     container : 'sociallogin-container',
                     onSuccess : (function(response) {
                         console.log('social login response',response);
                         this.accessToken = response.access_token;
-                        window.localStorage.setItem('access_token', response.access_token);
+                        window.localStorage.setItem('accessToken', response.access_token);
                         this.profile = response.Profile;
                         console.log("this.accessToken",this.accessToken);
                     }).bind(this),
@@ -320,22 +304,21 @@
                 });
             },
 
-            forgotPassword : function () {
+            initializeForgotPassword : function () {
                 let forgotpassword_options = {
                     container : "forgotpassword-container",
-                    onSuccess : function(response) {console.log('from password recovery',response)},
+                    onSuccess : this.makeAlert.bind(this,["An email with instructions has been sent to the address provided"]),
                     onError : this.makeAlert.bind(this),
                     resetPasswordUrl : "http://localhost:8080",
                     verificationUrl : window.location.origin,
                 };
-                console.log('forgotpassword_options',forgotpassword_options);
                 LRObject.util.ready(function() {
                     LRObject.init("forgotPassword", forgotpassword_options);
                 });
             },
 
 
-            registration : function () {
+            initializeRegistration : function () {
                 let registration_options = {
                     container : "registration-container",
                     onSuccess : (function(response) {
@@ -351,9 +334,11 @@
             },
 
             onDeleteAccountClick() {
-                LoginRadiusSDK.deleteAccountWithEmailConfirmation('localhost:8080',null, function (data) {
-                    console.log('data',data);
-                });
+                LoginRadiusSDK.deleteAccountWithEmailConfirmation(
+                    'localhost:8080',
+                    null,
+                    this.makeAlert.bind(this,["A confirmation email has been sent to the email address provided."])
+                )
             },
 
             toggleOn(container) {
@@ -364,23 +349,27 @@
 
             onLogoutClick() {
                 this.accessToken = null;
+                window.location.href = window.location.origin;
                 window.localStorage.removeItem('accessToken');
                 LoginRadiusSDK.accessTokenInvalidate((data) => console.log(data));
+                this.deleteUser = false;
+
+                // this.initializeSocialLogin();
+                // this.registration.call(this);
+                // this.initializeLogin();
+                // this.forgotPasswordMethod();
             },
 
             closeResetPassword() {
                 this.resetPassword = false;
-                window.location.href = "";
+                window.location.href = window.location.origin;
             },
 
             onChangePasswordClick() {
                 this.toggleOn("changePassword");
                 let changepassword_options = {
                     container : "changepassword-container",
-                    onSuccess : (function(response) {
-                        this.alertMessage = "Password changed successfully.";
-                        console.log('change password success',response);
-                    }).bind(this),
+                    onSuccess : this.makeAlert.bind(this,["Password changed successfully."]),
                     onError : this.makeAlert.bind(this),
                 };
 
@@ -391,17 +380,6 @@
 
             onEditProfileClick(){
                 this.toggleOn("editProfile");
-
-                // let profileeditor_options = {
-                //     container : "profile-editor-container",
-                //     onSuccess : this.makeAlert.bind(this),
-                //     onError : this.makeAlert.bind(this)
-                //
-                // };
-                // LRObject.util.ready(function() {
-                //     LRObject.init("profileEditor",profileeditor_options);
-                // });
-
             },
 
             onEditProfileSubmit() {
@@ -410,8 +388,8 @@
                     this.accessToken,
                     this.profile.Uid,
                     data=> {
-                        this.profile.firstName = this.firstName;
-                        this.profile.lastName = this.lastName;
+                        this.profile.FirstName = this.firstName;
+                        this.profile.LastName = this.lastName;
                         this.editProfile = false;
                         console.log('onSuccess ',data);
                     },
