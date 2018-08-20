@@ -66,14 +66,12 @@ The model is then modified and a view where the user confirms their intent to de
 **editProfileSubmit** make an API call via the updateData function on the LoginRadiusV2 library - see notes
 
 **facebookOverride** identifies the facebook button, and takes over the event handing for it to attempt to use the LoginRadiusV2 library's openWindow function to open a Facebook login page with a more narrow scope limited to the default profile
-## What is broken on my demo:
+## Notes:
 
 Facebook login returns an Invalid Scopes: user_birthday, user_location error. Changed the social settings to only get basic data and reduced scope in custom permissions, but still no luck.  I am getting the same error when logging in with facebook through the hosted app at https://lr-candidate4.hub.loginradius.com. 
 I tried to work around this by over riding the default way the facebook login request is handled, as well as setting up direct authentication from Facebook as opposed to going through login radius, but I had some challenges.
 
 I wasn't able to find anywhere in the docs how to set the deleteUrl when using the template for deleting users so I implemented the delete account functionality through the SDK.  At times it gives me an "The account limit for email requests for this resource has been reached for this time due to too many request" error, but it mainly works. 
-
-
 
 The documentation page for the LoginRadiusV2 library describes the api.updateData method as having 5 parameters, but it actually takes 6.  The Uid is missing as a parameter in the docs.
 h.api.updateData=function(b,g,f,h,k,l){
@@ -84,7 +82,7 @@ h.api.updateData=function(b,g,f,h,k,l){
 };
 https://docs.loginradius.com/api/v2/deployment/js-libraries/js-form-library#update3
 
-##Todo
+## Todo
 Refactor App.vue to remove everything that is not used
 
 Put in loading indicators
